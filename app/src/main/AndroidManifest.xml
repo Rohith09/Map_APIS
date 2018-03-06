@@ -9,7 +9,6 @@
     <permission android:name="com.example.chandrassekhar.map_apis.permission.MAPS_RECEIVE"
         android:protectionLevel="signature"/>
 
-
     <uses-permission android:name="com.example.chandrassekhar.map_apis.permission.MAPS_RECEIVE"/>
     <uses-permission android:name="com.google.android.providers.gsf.permissions.READ_GSERVICES"/>
 
