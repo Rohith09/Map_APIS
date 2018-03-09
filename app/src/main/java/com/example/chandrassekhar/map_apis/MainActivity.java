@@ -1,8 +1,13 @@
 package com.example.chandrassekhar.map_apis;
 
 import android.app.Dialog;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -14,24 +19,27 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+import java.io.IOException;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     GoogleMap mgoogleMap;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (googleServicesAvailability()){  //calling the method to check the availability of google play services.
             Toast.makeText(this,"Perfect!!!",Toast.LENGTH_LONG).show();
-            setContentView(R.layout.activity_main);  //!---- place the setcontentview here as it might display a view even though the google play services are not available on the users phone.
+            setContentView(R.layout.activity_main);//!---- place the setcontentview here as it might display a view even though the google play services are not available on the users phone.
+            button =findViewById(R.id.button);
+            button.setOnClickListener(this);
             initMap();
-
         }
         else{
             Toast.makeText(this," No Google Maps",Toast.LENGTH_LONG).show();
         }
-
-
     }
 
     private void initMap() {
@@ -75,6 +83,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng ll = new LatLng(lat , lng);
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll,z);
         mgoogleMap.moveCamera(update);  //takes this to a particular location.
+    }
+
+    @Override
+    public void onClick(View view) {
+        EditText edit1 = (EditText)findViewById(R.id.edit_text);
+        String location = edit1.getText().toString();
+        Geocoder gc = new Geocoder(this);   //Converts a string into Latitude and Longitudes.
+        try {
+            List <Address> list = gc.getFromLocationName(location,1);
+            Address address = list.get(0); //for getting the first location from the list and Address is an built in object.
+            String locality= address.getLocality();
+            Toast.makeText(this, locality,Toast.LENGTH_LONG).show();
+
+            double lat = address.getLatitude();
+            double lng = address.getLongitude();
+            goToLocationZoom(lat,lng,15);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }
