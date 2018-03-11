@@ -4,6 +4,9 @@ import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,9 +19,14 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -26,10 +34,11 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationSource.OnLocationChangedListener {
 
     GoogleMap mgoogleMap;
     Button button;
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,47 +77,52 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mgoogleMap = googleMap;
         //   goToLocationZoom(28.4985897,77.3759081, 15);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mgoogleMap.setMyLocationEnabled(true); //adds the pointer on the top right corner of the google map.
-
+        //     if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        //        return;
+        //  }
+        //   mgoogleMap.setMyLocationEnabled(true); //adds the pointer on the top right corner of the google map.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApiClient.connect();
     }
 
     private void goToLocation(double lat, double lng) {
-        LatLng ll = new LatLng(lat , lng);
+        LatLng ll = new LatLng(lat, lng);
         CameraUpdate update = CameraUpdateFactory.newLatLng(ll);
         mgoogleMap.moveCamera(update);  //takes this to a particular location.
 
     }
 
-    private void goToLocationZoom(double lat, double lng,float  z) {
-        LatLng ll = new LatLng(lat , lng);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll,z);
+    private void goToLocationZoom(double lat, double lng, float z) {
+        LatLng ll = new LatLng(lat, lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, z);
         mgoogleMap.moveCamera(update);  //takes this to a particular location.
     }
 
     @Override
     public void onClick(View view) {
-        EditText edit1 = (EditText)findViewById(R.id.edit_text);
+        EditText edit1 = (EditText) findViewById(R.id.edit_text);
         String location = edit1.getText().toString();
         Geocoder gc = new Geocoder(this);   //Converts a string into Latitude and Longitudes.
         try {
-            List <Address> list = gc.getFromLocationName(location,1);
+            List<Address> list = gc.getFromLocationName(location, 1);
             Address address = list.get(0); //for getting the first location from the list and Address is an built in object.
-            String locality= address.getLocality();
-            Toast.makeText(this, locality,Toast.LENGTH_LONG).show();
+            String locality = address.getLocality();
+            Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
 
             double lat = address.getLatitude();
             double lng = address.getLongitude();
-            goToLocationZoom(lat,lng,15);
+            goToLocationZoom(lat, lng, 15);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,13 +132,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);  //Provides a menu on top right corner which shows a list of map types.
+        getMenuInflater().inflate(R.menu.menu, menu);  //Provides a menu on top right corner which shows a list of map types.
         return super.onCreateOptionsMenu(menu);
     }
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.maptypeNone:
                 mgoogleMap.setMapType(GoogleMap.MAP_TYPE_NONE);
                 break;
@@ -142,8 +155,56 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 break;
             default:
                 break;
-         }
-         return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
+    LocationRequest mLocationRequest;
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(1000);
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, (LocationListener) this);
+
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if(location==null)
+        {
+            Toast.makeText(this, "Cant get current location", Toast.LENGTH_LONG).show();
+
+        }
+        else
+        {
+            LatLng ll = new LatLng(location.getLatitude(),location.getLongitude());
+            CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll,15);
+            mgoogleMap.animateCamera(update);
+        }
+
+    }
 }
