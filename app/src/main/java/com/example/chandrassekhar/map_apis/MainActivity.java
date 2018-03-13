@@ -32,6 +32,7 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mgoogleMap = googleMap;
-        //   goToLocationZoom(28.4985897,77.3759081, 15);
+          goToLocationZoom(28.4985897,77.3759081, 15);
         //     if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         // TODO: Consider calling
         //    ActivityCompat#requestPermissions
@@ -90,12 +91,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //        return;
         //  }
         //   mgoogleMap.setMyLocationEnabled(true); //adds the pointer on the top right corner of the google map.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        mGoogleApiClient.connect();
+      //  mGoogleApiClient = new GoogleApiClient.Builder(this)
+       //         .addApi(LocationServices.API)
+        //        .addConnectionCallbacks(this)
+         //       .addOnConnectionFailedListener(this)
+          //      .build();
+        // mGoogleApiClient.connect();
     }
 
     private void goToLocation(double lat, double lng) {
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String location = edit1.getText().toString();
         Geocoder gc = new Geocoder(this);   //Converts a string into Latitude and Longitudes.
         try {
-            List<Address> list = gc.getFromLocationName(location, 1);
+            List<Address> list = gc.getFromLocationName(location, 4);
             Address address = list.get(0); //for getting the first location from the list and Address is an built in object.
             String locality = address.getLocality();
             Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
@@ -125,6 +126,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lat = address.getLatitude();
             double lng = address.getLongitude();
             goToLocationZoom(lat, lng, 15);
+
+            //Below (131-132) is the code to add a new marker to the map.
+            MarkerOptions options = new MarkerOptions().title(location).position(new LatLng(lat,lng)).snippet("I am Here!");
+            mgoogleMap.addMarker(options);
 
         } catch (IOException e) {
             e.printStackTrace();
