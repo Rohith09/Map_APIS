@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -82,6 +83,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mgoogleMap = googleMap;
+
+        if(mgoogleMap != null)
+        {
+            mgoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                @Override
+                public View getInfoWindow(Marker marker) {
+                    return null;
+                }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+                    View v = getLayoutInflater().inflate(R.layout.info_window,null);
+                    TextView tvLocality = v.findViewById(R.id.tv_locality);
+                    TextView tvLat = v.findViewById(R.id.tv_lat);
+                    TextView tvLng = v.findViewById(R.id.tv_lng);
+                    TextView tvSnippet = v.findViewById(R.id.tv_snippet);
+                    LatLng ll = marker.getPosition();
+                    tvLocality.setText(marker.getTitle());
+                    tvLng.setText("Latitude :" + ll.latitude);
+                    tvLat.setText("Longitude :"+ ll.longitude);
+                    tvSnippet.setText(marker.getSnippet());
+
+                    return v;
+
+
+                }
+            });
+        }
           goToLocationZoom(28.4985897,77.3759081, 15);
         //     if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         // TODO: Consider calling
