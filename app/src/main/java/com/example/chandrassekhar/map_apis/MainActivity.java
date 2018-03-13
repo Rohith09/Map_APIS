@@ -32,6 +32,7 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleMap mgoogleMap;
     Button button;
     GoogleApiClient mGoogleApiClient;
+    Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String location = edit1.getText().toString();
         Geocoder gc = new Geocoder(this);   //Converts a string into Latitude and Longitudes.
         try {
-            List<Address> list = gc.getFromLocationName(location, 4);
+            List<Address> list = gc.getFromLocationName(location, 1);
             Address address = list.get(0); //for getting the first location from the list and Address is an built in object.
             String locality = address.getLocality();
             Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
@@ -127,9 +129,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lng = address.getLongitude();
             goToLocationZoom(lat, lng, 15);
 
+            if(marker!=null)
+            {
+                marker.remove();
+            }
+
             //Below (131-132) is the code to add a new marker to the map.
             MarkerOptions options = new MarkerOptions().title(location).position(new LatLng(lat,lng)).snippet("I am Here!");
-            mgoogleMap.addMarker(options);
+            marker=mgoogleMap.addMarker(options);
 
         } catch (IOException e) {
             e.printStackTrace();
