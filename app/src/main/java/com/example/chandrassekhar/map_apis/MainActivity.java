@@ -31,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -129,19 +130,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lng = address.getLongitude();
             goToLocationZoom(lat, lng, 15);
 
-            if(marker!=null)
-            {
-                marker.remove();
-            }
-
-            //Below (131-132) is the code to add a new marker to the map.
-            MarkerOptions options = new MarkerOptions().title(location).position(new LatLng(lat,lng)).snippet("I am Here!");
-            marker=mgoogleMap.addMarker(options);
+            setMarker(location, lat, lng);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void setMarker(String location, double lat, double lng) {
+        if(marker!=null)
+        {
+            marker.remove();
+        }
+
+        //Below (131-132) is the code to add a new marker to the map.
+        MarkerOptions options = new MarkerOptions()
+                                    .title(location)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)) //changing the color of the marker.
+                                    .position(new LatLng(lat,lng))
+                                    .snippet("I am Here!");
+        marker=mgoogleMap.addMarker(options);
     }
 
     @Override
