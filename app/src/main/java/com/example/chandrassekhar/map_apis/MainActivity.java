@@ -21,9 +21,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -63,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void initMap() {
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapfragment);
-        mapFragment.getMapAsync(this);  //OnMapReady is the call back method for this function.
+        mapFragment.getMapAsync(this);  //OnMapReady is the call back method for this function which initializes the map.
     }
 
     public boolean googleServicesAvailability() {  //user created function in order to check whether the google play store services are available on the users phone or not and returns a boolean value.
@@ -86,9 +83,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if(mgoogleMap != null)
         {
+
+            mgoogleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {  //updates the marker when dragged to a new location.
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+
+                }
+
+                @Override
+                public void onMarkerDrag(Marker marker) {
+
+                }
+
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    Geocoder gc = new Geocoder(MainActivity.this);
+                    LatLng ll = marker.getPosition();
+                    List <Address> list = null;
+
+                    try {
+                        list = gc.getFromLocation(ll.latitude,ll.longitude,1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address add = list.get(0);
+                    marker.setTitle(add.getLocality());
+                    marker.showInfoWindow();
+
+
+
+                }
+            });
             mgoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 @Override
-                public View getInfoWindow(Marker marker) {
+                public View getInfoWindow(Marker marker)
+                {
+
                     return null;
                 }
 
@@ -176,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Below (131-132) is the code to add a new marker to the map.
         MarkerOptions options = new MarkerOptions()
                                     .title(location)
+                                    .draggable(true)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)) //changing the color of the marker.
                                     .position(new LatLng(lat,lng))
                                     .snippet("I am Here!");
