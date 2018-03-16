@@ -1,14 +1,12 @@
 Basic Application to learn how to use the Google Map Apis in Android.
-The development of the complete Application is divided into 5 Phases.
 
-Phase 1:
--Provided a code for the creating a map interface  using the map fragment and making it visible on ther users phone,on the basis of whether the users phone has google play services installed on it or not.
+In this Android Application Gogole Map APIS have been used.
+User is given the choice of selecting which kind of Map they wants among the below mentioned:
+1.Normal
+2.Terrain
+3.Satellite
+4.Hybrid
 
-Phase 2:
--Provided a menu for the user where they can choose which kind of map they want to use.
-   1.Normal
-   2.Hybrid
-   3.Terrain
-   4.Satellite
--If the users location is switched on then the map interface performance the zoom action to the location of the user.
-   
+- Implementation of Markers.
+- Implementation of Info Window.
+- Implementation of Polygon using Multiple Markers.
