@@ -2,6 +2,7 @@ package com.example.chandrassekhar.map_apis;
 
 import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -30,6 +31,8 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -211,6 +214,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .position(new LatLng(lat,lng))
                                     .snippet("I am Here!");
         marker=mgoogleMap.addMarker(options);
+        Circle circle;
+
+        circle=drawCircle(new LatLng(lat,lng));
+    }
+
+    private Circle drawCircle(LatLng latLng) {
+        CircleOptions options = new CircleOptions()
+                                    .center(latLng).radius(1000).fillColor(0x33FF0000).strokeColor(Color.BLUE).strokeWidth(3);
+
+
+        return mgoogleMap.addCircle(options);
     }
 
     @Override
