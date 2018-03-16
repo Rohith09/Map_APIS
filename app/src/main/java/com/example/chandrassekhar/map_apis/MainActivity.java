@@ -36,8 +36,11 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationSource.OnLocationChangedListener {
@@ -86,6 +89,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if(mgoogleMap != null)
         {
+
+            mgoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    MainActivity.this.setMarker("Local",latLng.latitude,latLng.longitude);
+
+                }
+            });
 
             mgoogleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {  //updates the marker when dragged to a new location.
                 @Override
@@ -201,8 +212,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     Circle circle;
+    ArrayList<Marker> markers = new ArrayList<Marker>();
+    static final int POLYGON_POINTS = 5;
+    Polygon shape;
     private void setMarker(String location, double lat, double lng) {
-        if(marker!=null)
+  //      if(marker!=null)
+   //     {
+    //        removeEverything();
+     //   }
+
+        if(markers.size()==POLYGON_POINTS)
         {
             removeEverything();
         }
@@ -214,10 +233,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)) //changing the color of the marker.
                                     .position(new LatLng(lat,lng))
                                     .snippet("I am Here!");
-        marker=mgoogleMap.addMarker(options);
+        markers.add(mgoogleMap.addMarker(options));
+        if(markers.size()==POLYGON_POINTS)
+        {
+            drawPolygons();
+        }
 
 
         circle=drawCircle(new LatLng(lat,lng));
+    }
+
+    private void drawPolygons() {
+        PolygonOptions options = new PolygonOptions()
+                                    .fillColor(0x330000FF).strokeWidth(3).strokeColor(Color.RED);
+
+        for(int i=0;i<POLYGON_POINTS;i++)
+        {
+            options.add(markers.get(i).getPosition());
+        }
+        shape = mgoogleMap.addPolygon(options);
     }
 
     private Circle drawCircle(LatLng latLng) {
