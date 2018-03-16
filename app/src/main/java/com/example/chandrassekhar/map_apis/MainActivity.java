@@ -200,10 +200,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    Circle circle;
     private void setMarker(String location, double lat, double lng) {
         if(marker!=null)
         {
-            marker.remove();
+            removeEverything();
         }
 
         //Below (131-132) is the code to add a new marker to the map.
@@ -214,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .position(new LatLng(lat,lng))
                                     .snippet("I am Here!");
         marker=mgoogleMap.addMarker(options);
-        Circle circle;
+
 
         circle=drawCircle(new LatLng(lat,lng));
     }
@@ -227,6 +228,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return mgoogleMap.addCircle(options);
     }
 
+    private void removeEverything()
+    {
+        marker.remove();
+        marker = null;
+        circle.remove();
+        circle = null;
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);  //Provides a menu on top right corner which shows a list of map types.
